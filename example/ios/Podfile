@@ -1,0 +1,29 @@
+# Resolve with node to allow for hoisting
+require Pod::Executable.execute_command('node', ['-p',
+  'require.resolve(
+    "react-native-test-app/test_app.rb",
+    {paths: [process.argv[1]]},
+  )', __dir__]).strip
+
+# react-native-permissions
+require Pod::Executable.execute_command('node', ['-p',
+  'require.resolve(
+    "react-native-permissions/scripts/setup.rb",
+    {paths: [process.argv[1]]},
+  )', __dir__]).strip
+
+use_flipper! false unless ENV['USE_FLIPPER'] == '1'
+
+workspace 'Example.xcworkspace'
+
+use_test_app! do |target|
+  target.app do
+    # Setup Permissions for react-native-permissions
+    # Be sure to also update the Info.plist
+    # https://github.com/zoontek/react-native-permissions#ios
+    setup_permissions([
+      'Calendars',
+      'CalendarsWriteOnly',
+    ])
+  end
+end
